@@ -3,7 +3,7 @@ require('dotenv').config();
 const app = express();
 
 const { handleWebhook } = require('./controllers/webhook.controller');
-app.post('/api/webhook', express.raw({ type: 'application/json' }), handleWebhook);
+app.post('/api/webhook', express.json(), handleWebhook);
 
 app.use(express.json());
 const authRoutes = require('./routes/auth.routes');

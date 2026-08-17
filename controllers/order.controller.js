@@ -1,5 +1,5 @@
 const pool = require('../config/db');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const snap = require('../config/midtrans');
 
 const createOrder = async (req, res) => {
   const { items } = req.body;
@@ -41,26 +41,14 @@ const createOrder = async (req, res) => {
 
     await client.query('COMMIT');
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: items.map(cartItem => {
-        const menuItem = menuItems.find(m => m.id === cartItem.menuItemId);
-        return {
-          price_data: {
-            currency: 'usd',
-            product_data: { name: menuItem.name },
-            unit_amount: Math.round(menuItem.price * 100),
-          },
-          quantity: cartItem.quantity,
-        };
-      }),
-      mode: 'payment',
-      success_url: 'http://localhost:3000/success.html',
-      cancel_url: 'http://localhost:3000/cancel.html',
-      metadata: { orderId: order.id },
-    })
+    const transaction = await snap.createTransaction({
+      transaction_details: {
+        order_id: `order-${order.id}`,
+        gross_amount: Math.round(total),
+      },
+    });
 
-    res.status(201).json({ order, checkoutUrl: session.url });
+    res.status(201).json({ order, checkoutUrl: transaction.redirect_url });
   } catch (err) {
     await client.query('ROLLBACK');
     res.status(500).json({ error: 'Failed to create order' });
