@@ -50,6 +50,7 @@ const createOrder = async (req, res) => {
 
     res.status(201).json({ order, checkoutUrl: transaction.redirect_url });
   } catch (err) {
+    console.log(err);
     await client.query('ROLLBACK');
     res.status(500).json({ error: 'Failed to create order' });
   } finally {
