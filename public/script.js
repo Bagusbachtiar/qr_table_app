@@ -11,7 +11,7 @@ async function loadMenu(){
           <div class="menu-item-info">
             <h3>${item.name}</h3>
             <p class="menu-item-desc">${item.description || ''}</p>
-            <span class="menu-item-price">$${item.price}</span>
+            <span class="menu-item-price">Rp ${item.price}</span>
           </div>
           <button class="btn-add" onclick="addToCart(${item.id})">Add</button>
         </div>
@@ -37,14 +37,14 @@ function renderCart() {
   cartList.innerHTML = cart.map(c => `
     <div class="cart-item">
       <span>${c.name} x${c.qty}</span>
-      <span>$${(c.price * c.qty).toFixed(2)}</span>
+      <span>Rp ${c.price * c.qty}</span>
       <button class="btn-remove" onclick="removeFromCart(${c.id})">×</button>
     </div>
 `).join('');
 
 
     const total = cart.reduce((sum, c) => sum + c.price * c.qty, 0);
-  document.getElementById('cart-total').textContent = total.toFixed(2);
+  document.getElementById('cart-total').textContent = total ;
 }
 
 function removeFromCart(id) {
