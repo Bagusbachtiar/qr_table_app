@@ -58,6 +58,7 @@ async function checkout() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       items: cart.map(c => ({ menuItemId: c.id, quantity: c.qty })),
+      table_number: new URLSearchParams(window.location.search).get('table'),
     }),
   });
 

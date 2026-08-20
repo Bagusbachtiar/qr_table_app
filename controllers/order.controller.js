@@ -2,7 +2,7 @@ const pool = require('../config/db');
 const snap = require('../config/midtrans');
 
 const createOrder = async (req, res) => {
-  const { items } = req.body;
+  const { items, table_number } = req.body;
 
   const ids = items.map(i => i.menuItemId);
   const result = await pool.query(
@@ -26,8 +26,8 @@ const createOrder = async (req, res) => {
     await client.query('BEGIN');
 
     const orderResult = await client.query(
-      'INSERT INTO orders (total, status) VALUES ($1, $2) RETURNING *',
-      [total, 'pending']
+      'INSERT INTO orders (total, status, table_number) VALUES ($1, $2, $3) RETURNING *',
+      [total, 'pending', table_number]
     );
     const order = orderResult.rows[0];
 
