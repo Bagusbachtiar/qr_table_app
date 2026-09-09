@@ -57,8 +57,21 @@ async function loadMenu() {
 
             if (name === ''){
                 alert('Item name cannot be empty.');
-            return;
+                return;
             }
+                const newPrice = prompt('Enter the new price in Rupiah:', item.price);
+
+                if (newPrice === null) {
+                    return;
+                }
+
+                const price = Number(newPrice);
+
+                if (!Number.isInteger(price) || price <= 0){
+                    alert('Price must be a positive whole number.');
+                    return;
+                }
+            
 
             const response = await fetch(`/api/menu/${item.id}`, {
                 method: 'PATCH', 
@@ -66,7 +79,7 @@ async function loadMenu() {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ name }),
+                body: JSON.stringify({ name, price }),
             });
 
             const data = await response.json();

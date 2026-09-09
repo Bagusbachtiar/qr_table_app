@@ -21,6 +21,14 @@ const getMenuItems = async (req, res) => {
     res.json(result.rows);
 };
 
+const getAdminMenuItems = async (req, res) => {
+    const result = await pool.query (
+        'SELECT * FROM menu_items ORDER BY id'
+    );
+
+    res.json(result.rows);
+};
+
 const updateMenuItem = async (req, res) => {
     const { id } = req.params;
     const { name, price, description, category, available } = req.body;
@@ -56,4 +64,10 @@ const deleteMenuItem = async (req, res) => {
     res.json({ message: 'Menu Item Deleted '});
 }
 
-module.exports = { createMenuItem, getMenuItems, updateMenuItem, deleteMenuItem };
+module.exports = {
+    createMenuItem,
+    getMenuItems, 
+    getAdminMenuItems,
+    updateMenuItem, 
+    deleteMenuItem,
+};
