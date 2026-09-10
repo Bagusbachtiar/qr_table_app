@@ -5,7 +5,17 @@ if (!token) {
 }
 
 async function loadMenu() {
-    const response = await fetch('/api/menu');
+    const response = await fetch('/api/menu/admin', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if(!response.ok) {
+        const error = await response.json();
+        alert(error.error);
+        return;
+    }
     const items = await response.json();
 
     const menuList = document.getElementById('menu-list');
@@ -13,7 +23,8 @@ async function loadMenu() {
 
     items.forEach((item) => {
         const row = document.createElement('p');
-        row.textContent = `${item.name} - Rp ${item.price}`;
+        const status = item.available ? 'Available' : 'Sold out';
+        row.textContent = `${item.name} - Rp ${item.price} - ${status}`;
 
         const deleteButton = document.createElement('button');
         deleteButton.type = 'button';
@@ -71,7 +82,25 @@ async function loadMenu() {
                     alert('Price must be a positive whole number.');
                     return;
                 }
+
+            const newDescription = prompt(
+                'Enter the description:',
+                item.description ?? ''
+            );
+
+            if (newDescription === null) {
+                return;
+            }
+
+            const description = newDescription.trim();
             
+            const newCategory = prompt('Enter the category:', item.category ?? '');
+
+            if (newCategory === null){
+                return;
+            }
+
+            const category = newCategory.trim();
 
             const response = await fetch(`/api/menu/${item.id}`, {
                 method: 'PATCH', 
@@ -79,7 +108,7 @@ async function loadMenu() {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ name, price }),
+                body: JSON.stringify({ name, price, description, category }),
             });
 
             const data = await response.json();
@@ -91,6 +120,34 @@ async function loadMenu() {
             await loadMenu();
         });
 
+        const availabilityButton = document.createElement('button');
+        availabilityButton.type = 'button';
+        availabilityButton.textContent = item.available
+            ? 'Mark sold out'
+            : 'Mark available';
+
+        availabilityButton.addEventListener('click', async () => {
+            const available = !item.available;
+            const response = await fetch(`/api/menu/${item.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ available }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.error);
+                return;
+            }
+
+            await loadMenu();
+        });
+
+        row.appendChild(availabilityButton);
         row.appendChild(editButton);
         row.appendChild(deleteButton);
         menuList.appendChild(row);
@@ -104,8 +161,10 @@ if(token) {
 document.getElementById('add-menu-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const name =document.getElementById('item-name').value;
+    const name = document.getElementById('item-name').value;
     const price = Number(document.getElementById('item-price').value);
+    const description = document.getElementById('item-description').value.trim();
+    const category = document.getElementById('item-category').value.trim();
 
     const response = await fetch('/api/menu', {
         method: 'POST',
@@ -113,7 +172,7 @@ document.getElementById('add-menu-form').addEventListener('submit', async (e) =>
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name, price, available:true }),
+        body: JSON.stringify({ name, price, category, description, available:true }),
     });
 
     const data = await response.json();
