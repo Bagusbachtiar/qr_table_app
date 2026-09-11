@@ -60,7 +60,21 @@ const createOrder = async (req, res) => {
 
 const getOrders = async (req, res) => {
   const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
-  res.json(result.rows);
+
+  const itemResult =  await pool.query(`
+    SELECT order_items.*, menu_items.name
+    FROM order_items
+    LEFT JOIN menu_items ON menu_items.id = order_items.menu_item_id
+    `);
+    
+    const orders = result.rows.map((order) => {
+      return{
+        ...order,
+        items: itemResult.rows.filter((item) => item.order_id === order.id),
+      };
+    });
+
+  res.json(orders);
 };
 
 
