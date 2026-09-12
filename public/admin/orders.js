@@ -42,3 +42,7 @@ async function loadOrders() {
 if (token) {
     loadOrders();
 }
+
+document.getElementById('refresh-orders').addEventListener('click', () => {
+    loadOrders();
+});
