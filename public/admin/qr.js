@@ -17,5 +17,19 @@ document.getElementById('qr-form').addEventListener('submit', (e) => {
   const menuUrl = new URL('/', window.location.origin);
   menuUrl.searchParams.set('table', tableNumber);
 
-  console.log(menuUrl.href);
+  const canvas = document.getElementById('qr-code');
+
+  QRCode.toCanvas(canvas, menuUrl.href, (error) => {
+    if (error){
+      alert('Could not generate the QR code.');
+      console.error(error);
+      return;
+    }
+    const downloadLink = document.getElementById('download-qr');
+    downloadLink.href = canvas.toDataURL('image/png');
+    downloadLink.download = `table-${tableNumber}.png`;
+    downloadLink.hidden = false;
+  });
+
+  
 });

@@ -17,5 +17,8 @@
     "midtrans-client": "^1.4.3",
     "pg": "^8.22.0",
     "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.1"
   }
 }
