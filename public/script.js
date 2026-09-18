@@ -1,6 +1,12 @@
 let menuItems = [];
 let cart = [];
 
+const tableNumber = new URLSearchParams(window.location.search).get('table');
+
+document.getElementById('table-info').textContent = tableNumber
+  ? `Table ${tableNumber}`
+  : 'No table selected';
+
 async function loadMenu(){
     const response = await fetch('/api/menu');
     menuItems = await response.json();
