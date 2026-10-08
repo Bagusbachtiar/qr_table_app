@@ -117,3 +117,10 @@ h2 {
 .btn-checkout:hover {
   background: #235940;
 }
+
+.btn-add,
+.btn-remove,
+.btn-checkout {
+  min-width: 44px;
+  min-height: 44px;
+}

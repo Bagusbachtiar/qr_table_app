@@ -59,6 +59,13 @@ function removeFromCart(id) {
 }
 
 async function checkout() {
+
+  if (cart.length === 0) {
+    alert('Add an item to your cart before checking out.');
+    return;
+  }
+
+  try {
   const response = await fetch('/api/orders', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -69,7 +76,19 @@ async function checkout() {
   });
 
   const data = await response.json();
+
+  if (!response.ok) {
+    alert(data.error || 'Could not start checkout. Please try again.');
+    return;
+  }
+
   window.location.href = data.checkoutUrl;
+
+  } catch (error) {
+    console.error(error);
+    alert('Could not connect. Check your connection before trying again.');
+
+  }
 }
 
 loadMenu();
