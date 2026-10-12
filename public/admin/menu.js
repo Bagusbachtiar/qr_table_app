@@ -71,7 +71,7 @@ async function loadMenu() {
                 return;
             }
                 const newPrice = prompt('Enter the new price in Rupiah:', item.price);
-
+                
                 if (newPrice === null) {
                     return;
                 }
