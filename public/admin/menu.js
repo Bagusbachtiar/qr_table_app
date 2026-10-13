@@ -5,7 +5,17 @@ if (!token) {
 }
 
 async function loadMenu() {
-    const response = await fetch('/api/menu/admin', {
+    const urlParams = new URLSearchParams(window.location.search);
+    // Check if the 'showAll' parameter is present in the URL (e.g., ?showAll=true)
+    const showAll = urlParams.get('showAll') === 'true';
+
+    let url = '/api/menu/admin';
+    if (showAll) {
+        // Append the flag to the URL so the backend knows to ignore availability filters
+        url += '?showAll=true';
+    }
+
+    const response = await fetch(url, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
