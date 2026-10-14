@@ -59,22 +59,56 @@ const createOrder = async (req, res) => {
 };
 
 const getOrders = async (req, res) => {
-  const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
+    try {
+        // We use a LEFT JOIN to ensure that orders that might somehow have no items are still listed.
+        const query = `
+            SELECT 
+                o.*, 
+                oi.menu_item_id, 
+                oi.quantity, 
+                oi.price AS item_price, 
+                m.name AS item_name
+            FROM orders o
+            LEFT JOIN order_items oi ON o.id = oi.order_id
+            LEFT JOIN menu_items m ON oi.menu_item_id = m.id
+            ORDER BY o.created_at DESC;
+        `;
 
-  const itemResult =  await pool.query(`
-    SELECT order_items.*, menu_items.name
-    FROM order_items
-    LEFT JOIN menu_items ON menu_items.id = order_items.menu_item_id
-    `);
-    
-    const orders = result.rows.map((order) => {
-      return{
-        ...order,
-        items: itemResult.rows.filter((item) => item.order_id === order.id),
-      };
-    });
+        const result = await pool.query(query);
 
-  res.json(orders);
+        // Structure the flat array of results into grouped order objects
+        const ordersMap = new Map();
+
+        for (const row of result.rows) {
+            const orderId = row.id;
+
+            if (!ordersMap.has(orderId)) {
+                // Initialize a new order object if we haven't seen this ID yet
+                ordersMap.set(orderId, {
+                    ...row,
+                    items: [] // Initialize an empty array for line items
+                });
+            }
+
+            // Add the item details to the correct order object
+            if (row.menu_item_id) {
+                 ordersMap.get(orderId).items.push({
+                    menuItemId: row.menu_item_id,
+                    quantity: row.quantity,
+                    price: row.item_price,
+                    name: row.item_name
+                });
+            }
+        }
+
+        // Convert the Map values back into a standard array and send it
+        const orders = Array.from(ordersMap.values());
+        res.json(orders);
+
+    } catch (err) {
+        console.error("Error fetching orders:", err);
+        res.status(500).json({ error: 'Failed to retrieve orders.' });
+    }
 };
 
 

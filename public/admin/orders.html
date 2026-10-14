@@ -1,13 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Admin Orders</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Order Dashboard</title>
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-  <h1>Orders</h1>
-  <a href="menu.html">Manage meqwnu</a>
-  <button type="button" id="refresh-orders">Refresh orders</button>
-  <div id="order-list"></div>
-<script src="orders.js"></script>
+    <header>
+        <h1>Admin Order Dashboard</h1>
+        <button id="logout-btn">Logout</button>
+    </header>
+
+    <main>
+        <h2>Incoming Orders</h2>
+        <div id="orders-container">
+            <p>Loading orders...</p>
+            <!-- The order table will be inserted here by JavaScript -->
+        </div>
+    </main>
+
+    <script src="../admin.js"></script> <!-- Assuming your admin script is here -->
+    <script src="orders.js"></script> <!-- NEW: Script to handle order fetching/display -->
 </body>
 </html>
